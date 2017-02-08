@@ -5,7 +5,7 @@ export default class SubmitCustomizado extends Component{
     return(
       <div className="pure-control-group">
         <label></label>
-        <button type="submit" className="pure-button pure-button-primary">Gravar</button>
+        <button type="submit" className="pure-button pure-button-primary" value={this.props.label}>Gravar</button>
       </div>
     );
   }
