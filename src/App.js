@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
 import './css/pure-min.css';
 import './css/side-menu.css';
-import $ from 'jquery';
-import InputCustomizado from './componentes/InputCustomizado';
-import SubmitCustomizado from './componentes/SubmitCustomizado';
-import {FormularioAutor, TabelaAutores} from './Autor';
+import AutorBox from './Autor';
 
 class App extends Component {
 
@@ -13,7 +10,6 @@ class App extends Component {
       <div id="layout">
 
           <a href="#menu" id="menuLink" className="menu-link">
-
               <span></span>
           </a>
 
@@ -25,8 +21,6 @@ class App extends Component {
                       <li className="pure-menu-item"><a href="#" className="pure-menu-link">Home</a></li>
                       <li className="pure-menu-item"><a href="#" className="pure-menu-link">Autor</a></li>
                       <li className="pure-menu-item"><a href="#" className="pure-menu-link">Livro</a></li>
-
-
                   </ul>
               </div>
           </div>
@@ -36,8 +30,7 @@ class App extends Component {
                     <h1>Cadastro de Autores</h1>
                   </div>
                   <div className="content" id="content">
-                    <FormularioAutor/>
-                    <TabelaAutores/>
+                    <AutorBox/>
                   </div>
                 </div>
 

@@ -12,7 +12,6 @@ export class FormularioAutor extends Component{
     this.setNome = this.setNome.bind(this);
     this.setEmail = this.setEmail.bind(this);
     this.setSenha = this.setSenha.bind(this);
-
   }
 
   enviaForm(evento){
@@ -25,7 +24,7 @@ export class FormularioAutor extends Component{
       data: JSON.stringify({nome:this.state.nome, email:this.state.email, senha:this.state.senha}),
       success: function(resposta){
         console.log("enviado com sucesso");
-        this.setState({lista:resposta});
+        this.props.callbackAtualizaListagem(resposta);
       }.bind(this),
       error: function(resposta){
         console.log("erro");
@@ -62,7 +61,7 @@ export class FormularioAutor extends Component{
     );
   }
 }
-export class TabelaAutores extends Component {
+class TabelaAutores extends Component {
   constructor() {
     super();
     this.state = {lista : []};
@@ -102,6 +101,38 @@ export class TabelaAutores extends Component {
             }
           </tbody>
         </table>
+      </div>
+    );
+  }
+}
+
+export default class AutorBox extends Component{
+  constructor() {
+    super();
+    this.state = {lista : []};
+    this.atualizaListagem = this.atualizaListagem.bind(this);
+  }
+
+  componentDidMount(){
+      $.ajax({
+          url:"http://localhost:8080/api/autores",
+          dataType: 'json',
+          success:function(resposta){
+            this.setState({lista:resposta});
+          }.bind(this)
+        }
+      );
+  }
+
+  atualizaListagem(novaLista){
+    this.setState({lista:novaLista});
+  }
+
+  render() {
+    return(
+      <div>
+        <FormularioAutor callbackAtualizaListagem={this.atualizaListagem}/>
+        <TabelaAutores lista={this.state.lista}/>
       </div>
     );
   }
