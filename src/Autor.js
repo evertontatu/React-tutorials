@@ -3,6 +3,7 @@ import $ from 'jquery';
 import InputCustomizado from './componentes/InputCustomizado';
 import SubmitCustomizado from './componentes/SubmitCustomizado';
 import PubSub from 'pubsub-js';
+import TratadorErros from './TratadorErros';
 
 export class FormularioAutor extends Component{
 
@@ -24,11 +25,12 @@ export class FormularioAutor extends Component{
       type:'post',
       data: JSON.stringify({nome:this.state.nome, email:this.state.email, senha:this.state.senha}),
       success: function(novaListagem){
-        console.log("enviado com sucesso");
         PubSub.publish('atualiza-lista-autores',novaListagem);
       },
       error: function(resposta){
-        console.log("erro");
+        if(resposta.status === 400){
+          new TratadorErros().publicaErros(resposta.responseJSON);
+        }
       }
     });
   }
@@ -125,7 +127,6 @@ export default class AutorBox extends Component{
 
       PubSub.subscribe('atualiza-lista-autores', function(topico,novaLista){
         this.setState({lista:novaLista});
-        console.log("pubsub");
       }.bind(this));
     }
 
