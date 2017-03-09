@@ -8,11 +8,11 @@ class FormularioLivro extends Component {
 
   constructor() {
     super();
-    this.state = {nome:'',email:'',senha:''};
+    this.state = {titulo:'',preco:'',autorId:''};
     this.enviaForm = this.enviaForm.bind(this);
-    this.setNome = this.setNome.bind(this);
-    this.setEmail = this.setEmail.bind(this);
-    this.setSenha = this.setSenha.bind(this);
+    this.setTitulo = this.setTitulo.bind(this);
+    this.setPreco = this.setPreco.bind(this);
+    this.setAutorId = this.setAutorId.bind(this);
   }
 
   enviaForm(evento){
@@ -22,10 +22,10 @@ class FormularioLivro extends Component {
       contentType:'application/json',
       dataType:'json',
       type:'post',
-      data: JSON.stringify({nome:this.state.nome,email:this.state.email,senha:this.state.senha}),
+      data: JSON.stringify({titulo:this.state.titulo,preco:this.state.preco,autorId:this.state.autorId}),
       success: function(novaListagem){
         PubSub.publish('atualiza-lista-livros',novaListagem);
-        this.setState({nome:'',email:'',senha:''});
+        this.setState({titulo:'',preco:'',autorId:''});
       }.bind(this),
       error: function(resposta){
         if(resposta.status === 400) {
@@ -38,33 +38,31 @@ class FormularioLivro extends Component {
     });
   }
 
-  setNome(evento){
-    this.setState({nome:evento.target.value});
+  setTitulo(evento){
+    this.setState({titulo:evento.target.value});
   }
 
-  setEmail(evento){
-    this.setState({email:evento.target.value});
+  setPreco(evento){
+    this.setState({preco:evento.target.value});
   }
 
-  setSenha(evento){
-    this.setState({senha:evento.target.value});
+  setAutorId(evento){
+    this.setState({autorId:evento.target.value});
   }
 
     render() {
         return (
             <div className="pure-form pure-form-aligned">
               <form className="pure-form pure-form-aligned" onSubmit={this.enviaForm} method="post">
-                <InputCustomizado id="nome" type="text" name="nome" value={this.state.nome} onChange={this.setNome} label="Nome"/>
-                <InputCustomizado id="email" type="email" name="email" value={this.state.email} onChange={this.setEmail} label="Email"/>
-                <InputCustomizado id="senha" type="password" name="senha" value={this.state.senha} onChange={this.setSenha} label="Senha"/>
+                <InputCustomizado id="titulo" type="text" name="titulo" value={this.state.titulo} onChange={this.setTitulo} label="Nome"/>
+                <InputCustomizado id="preco" type="text" name="preco" value={this.state.preco} onChange={this.setPreco} label="Email"/>
+                <InputCustomizado id="autorId" type="text" name="autorId" value={this.state.autorId} onChange={this.setAutorID} label="Senha"/>
                 <div className="pure-control-group">
                   <label></label>
                   <button type="submit" className="pure-button pure-button-primary">Gravar</button>
                 </div>
               </form>
-
             </div>
-
         );
     }
 }
@@ -77,8 +75,9 @@ class TabelaLivros extends Component {
             <table className="pure-table">
               <thead>
                 <tr>
-                  <th>Nome</th>
-                  <th>email</th>
+                  <th>Titulo</th>
+                  <th>Preco</th>
+                  <th>Autor</th>
                 </tr>
               </thead>
               <tbody>
@@ -86,8 +85,9 @@ class TabelaLivros extends Component {
                   this.props.lista.map(function(livro){
                     return (
                       <tr key={livro.id}>
-                        <td>{livro.nome}</td>
-                        <td>{livro.email}</td>
+                        <td>{livro.titulo}</td>
+                        <td>{livro.preco}</td>
+                        <td>{livro.autor.nome}</td>
                       </tr>
                     );
                   })
