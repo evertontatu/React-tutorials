@@ -15,10 +15,23 @@ class FormularioLivro extends Component {
     this.setAutorId = this.setAutorId.bind(this);
   }
 
+  setTitulo(evento){
+    this.setState({titulo:evento.target.value});
+  }
+
+  setPreco(evento){
+    this.setState({preco:evento.target.value});
+  }
+
+  setAutorId(evento){
+    this.setState({autorId:evento.target.value});
+  }
+
   enviaForm(evento){
     evento.preventDefault();
+
     $.ajax({
-      url:'http://localhost:8080/api/livro',
+      url:'http://localhost:8080/api/livros',
       contentType:'application/json',
       dataType:'json',
       type:'post',
@@ -38,25 +51,25 @@ class FormularioLivro extends Component {
     });
   }
 
-  setTitulo(evento){
-    this.setState({titulo:evento.target.value});
-  }
-
-  setPreco(evento){
-    this.setState({preco:evento.target.value});
-  }
-
-  setAutorId(evento){
-    this.setState({autorId:evento.target.value});
-  }
-
     render() {
         return (
             <div className="pure-form pure-form-aligned">
               <form className="pure-form pure-form-aligned" onSubmit={this.enviaForm} method="post">
-                <InputCustomizado id="titulo" type="text" name="titulo" value={this.state.titulo} onChange={this.setTitulo} label="Nome"/>
-                <InputCustomizado id="preco" type="text" name="preco" value={this.state.preco} onChange={this.setPreco} label="Email"/>
-                <InputCustomizado id="autorId" type="text" name="autorId" value={this.state.autorId} onChange={this.setAutorID} label="Senha"/>
+                <InputCustomizado id="titulo" type="text" name="titulo" value={this.state.titulo} onChange={this.setTitulo} label="Título"/>
+                <InputCustomizado id="preco" type="text" name="preco" value={this.state.preco} onChange={this.setPreco} label="Preço"/>
+
+                <div className="pure-control-group">
+                  <label htmlFor="autorId">Autor</label>
+                  <select value={this.state.autorId} name="autorId" id="autorId" onChange={this.setAutorId}>
+                    <option value="">Selecione autor</option>
+                    {
+                      this.props.autores.map(function(autor){
+                        return <option value={autor.id}>{autor.nome}</option>
+                      })
+                    }
+                  </select>
+                </div>
+
                 <div className="pure-control-group">
                   <label></label>
                   <button type="submit" className="pure-button pure-button-primary">Gravar</button>
@@ -103,7 +116,7 @@ export default class LivroBox extends Component {
 
   constructor() {
     super();
-    this.state = {lista : []};
+    this.state = {lista : [],autores : []};
   }
 
   componentDidMount(){
@@ -112,6 +125,14 @@ export default class LivroBox extends Component {
         dataType: 'json',
         success:function(resposta){
           this.setState({lista:resposta});
+        }.bind(this)
+      }
+    );
+    $.ajax({
+        url:"http://localhost:8080/api/autores",
+        dataType: 'json',
+        success:function(resposta){
+          this.setState({autores:resposta});
         }.bind(this)
       }
     );
@@ -129,7 +150,7 @@ export default class LivroBox extends Component {
           <h1>Cadastro de livros</h1>
         </div>
         <div className="content" id="content">
-          <FormularioLivro/>
+          <FormularioLivro autores={this.state.autores}/>
           <TabelaLivros lista={this.state.lista}/>
         </div>
       </div>
