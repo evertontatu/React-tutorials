@@ -9,10 +9,10 @@ class FormularioLivro extends Component {
   constructor() {
     super();
     this.state = {titulo:'',preco:'',autorId:''};
-    this.enviaForm = this.enviaForm.bind(this);
     this.setTitulo = this.setTitulo.bind(this);
     this.setPreco = this.setPreco.bind(this);
     this.setAutorId = this.setAutorId.bind(this);
+    this.enviaForm = this.enviaForm.bind(this);
   }
 
   setTitulo(evento){
@@ -29,17 +29,20 @@ class FormularioLivro extends Component {
 
   enviaForm(evento){
     evento.preventDefault();
+    var titulo = this.state.titulo.trim();
+    var preco = this.state.preco.trim();
+    var autorId = this.state.autorId;
 
     $.ajax({
       url:'http://localhost:8080/api/livros',
       contentType:'application/json',
       dataType:'json',
-      type:'post',
-      data: JSON.stringify({titulo:this.state.titulo,preco:this.state.preco,autorId:this.state.autorId}),
+      type:'POST',
+      data: JSON.stringify({titulo:titulo,preco:preco,autorId:autorId}),
       success: function(novaListagem){
         PubSub.publish('atualiza-lista-livros',novaListagem);
         this.setState({titulo:'',preco:'',autorId:''});
-      }.bind(this),
+      },
       error: function(resposta){
         if(resposta.status === 400) {
           new TratadorErros().publicaErros(resposta.responseJSON);
@@ -49,40 +52,49 @@ class FormularioLivro extends Component {
         PubSub.publish("limpa-erros",{});
       }
     });
+    this.setState({titulo: '', preco: '', autorId: ''});
   }
 
     render() {
-        return (
-            <div className="pure-form pure-form-aligned">
-              <form className="pure-form pure-form-aligned" onSubmit={this.enviaForm} method="post">
-                <InputCustomizado id="titulo" type="text" name="titulo" value={this.state.titulo} onChange={this.setTitulo} label="Título"/>
-                <InputCustomizado id="preco" type="text" name="preco" value={this.state.preco} onChange={this.setPreco} label="Preço"/>
+      var autores = this.props.autores.map(function(autor){
+        return <option key={autor.id} value={autor.id}>{autor.nome}</option>;
+      });
+      return (
+          <div className="pure-form pure-form-aligned">
+            <form className="pure-form pure-form-aligned" onSubmit={this.enviaForm}>
+              <InputCustomizado id="titulo" type="text" name="titulo" value={this.state.titulo} onChange={this.setTitulo} label="Título"/>
+              <InputCustomizado id="preco" type="text" name="preco" value={this.state.preco} onChange={this.setPreco} label="Preço"/>
 
-                <div className="pure-control-group">
-                  <label htmlFor="autorId">Autor</label>
-                  <select value={this.state.autorId} name="autorId" id="autorId" onChange={this.setAutorId}>
-                    <option value="">Selecione autor</option>
-                    {
-                      this.props.autores.map(function(autor){
-                        return <option value={autor.id}>{autor.nome}</option>
-                      })
-                    }
-                  </select>
-                </div>
+              <div className="pure-control-group">
+                <label htmlFor="autorId">Autor</label>
+                <select value={this.state.autorId} name="autorId" id="autorId" onChange={this.setAutorId}>
+                  <option value="">Selecione autor</option>
+                  {autores}
+                </select>
+              </div>
 
-                <div className="pure-control-group">
-                  <label></label>
-                  <button type="submit" className="pure-button pure-button-primary">Gravar</button>
-                </div>
-              </form>
-            </div>
-        );
+              <div className="pure-control-group">
+                <label></label>
+                <button type="submit" className="pure-button pure-button-primary">Gravar</button>
+              </div>
+            </form>
+          </div>
+      );
     }
 }
 
 class TabelaLivros extends Component {
 
     render() {
+        var livros = this.props.lista.map(function(livro){
+        return(
+            <tr key={livro.titulo}>
+              <td>{livro.titulo}</td>
+              <td>{livro.autor.nome}</td>
+              <td>{livro.preco}</td>
+            </tr>
+          );
+        });
         return(
           <div>
             <table className="pure-table">
@@ -94,17 +106,7 @@ class TabelaLivros extends Component {
                 </tr>
               </thead>
               <tbody>
-                {
-                  this.props.lista.map(function(livro){
-                    return (
-                      <tr key={livro.id}>
-                        <td>{livro.titulo}</td>
-                        <td>{livro.preco}</td>
-                        <td>{livro.autor.nome}</td>
-                      </tr>
-                    );
-                  })
-                }
+                {livros}
               </tbody>
             </table>
           </div>
